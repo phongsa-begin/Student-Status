@@ -1,0 +1,24 @@
+name: Sync OneDrive Excel
+on:
+  schedule:
+    - cron: '*/30 * * * *' # ดึงข้อมูลจาก OneDrive ทุกๆ 30 นาที
+  workflow_dispatch: # เปิดให้กดดึงข้อมูลแบบ Manual ได้ด้วย
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Download Excel File
+      run: |
+        curl -L -o "data.xlsx" "https://chula-my.sharepoint.com/:x:/g/personal/phongsathorn_r_chula_ac_th/IQB1pTtCxyh5SIWS45t17-_bAak0euiV-2-NQYjnBnwViJE?download=1"
+
+    - name: Commit and Push
+      run: |
+        git config --global user.name 'OneDrive Bot'
+        git config --global user.email 'bot@onedrive.sync'
+        git add data.xlsx
+        git diff-index --quiet HEAD || git commit -m "Auto-sync OneDrive Excel data"
+        git push
